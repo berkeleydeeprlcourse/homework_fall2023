@@ -4,7 +4,7 @@ import time
 ############################################
 ############################################
 
-MJ_ENV_NAMES = ["Ant-v4", "Humanoid-v4", "Walker2d-v4", "HalfCheetah-v4", "Hopper-v4"]
+MJ_ENV_NAMES = ["Ant-v4", "Walker2d-v4", "HalfCheetah-v4", "Hopper-v4"]
 MJ_ENV_KWARGS = {name: {"render_mode": "rgb_array"} for name in MJ_ENV_NAMES}
 MJ_ENV_KWARGS["Ant-v4"]["use_contact_forces"] = True
 
