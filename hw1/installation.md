@@ -39,3 +39,16 @@ B. Install on system Python:
 	```
 	pip install -r requirements.txt
 	```
+
+## Troubleshooting 
+
+You may encounter the following GLFW errors if running on machine without a display:
+
+GLFWError: (65544) b'X11: The DISPLAY environment variable is missing'
+  warnings.warn(message, GLFWError)
+GLFWError: (65537) b'The GLFW library is not initialized'
+
+These can be resolved with:
+```
+export MUJOCO_GL=egl
+```
