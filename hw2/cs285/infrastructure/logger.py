@@ -29,7 +29,7 @@ class Logger:
     def log_paths_as_videos(self, paths, step, max_videos_to_save=2, fps=10, video_title='video'):
 
         # reshape the rollouts
-        videos = [np.transpose(p['image_obs'], [0, 3, 1, 2]) for p in paths]
+        videos = [np.transpose(p['image_obs'][:, 0], [0, 3, 1, 2]) for p in paths]
 
         # max rollout length
         max_videos_to_save = np.min([max_videos_to_save, len(videos)])

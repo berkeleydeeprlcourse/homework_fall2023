@@ -45,7 +45,11 @@ class RL_Trainer(object):
         #############
 
         # Make the gym environment
-        self.env = gym.make(self.params['env_name'])
+        if self.params['video_log_freq'] == -1:
+            render_mode = None
+        else:
+            render_mode = 'rgb_array'
+        self.env = gym.make(self.params['env_name'], render_mode=render_mode)
         self.env.seed(seed)
 
         # Add noise wrapper
