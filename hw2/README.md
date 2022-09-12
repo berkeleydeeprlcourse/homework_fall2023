@@ -3,6 +3,8 @@
 You can run this code on your own machine or on Google Colab.
 
 1. **Local option:** If you choose to run locally, you will need to install MuJoCo and some Python packages; see [installation.md](../hw1/installation.md) from homework 1 for instructions. If you completed this installation for homework 1, you do not need to repeat it.
+- Make sure to run `pip install -e .` in hw2 folder.
+- Also run `pip install gym[box2d]`
 2. **Colab:** The first few sections of the notebook will install all required dependencies. You can try out the Colab option by clicking the badge below:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2022/blob/master/hw2/cs285/scripts/run_hw2.ipynb)

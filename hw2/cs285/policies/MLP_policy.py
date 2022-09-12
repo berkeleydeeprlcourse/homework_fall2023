@@ -69,7 +69,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
                 n_layers=self.n_layers,
                 size=self.size,
             )
-            self.baseline.to(device)
+            self.baseline.to(ptu.device)
             self.baseline_optimizer = optim.Adam(
                 self.baseline.parameters(),
                 self.learning_rate,

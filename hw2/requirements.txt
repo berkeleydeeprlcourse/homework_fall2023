@@ -1,5 +1,6 @@
 mujoco==2.2.0
 gym==0.25.2
+gym[box2d]
 tensorboard==2.10.0
 tensorboardX==2.5.1
 matplotlib==3.5.3

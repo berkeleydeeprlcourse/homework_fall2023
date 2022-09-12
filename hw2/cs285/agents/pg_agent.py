@@ -78,7 +78,7 @@ class PGAgent(BaseAgent):
 
         return q_values
 
-    def estimate_advantage(self, obs, rews_list, q_values, terminals):
+    def estimate_advantage(self, obs: np.ndarray, rews_list: np.ndarray, q_values: np.ndarray, terminals: np.ndarray):
 
         """
             Computes advantages by (possibly) using GAE, or subtracting a baseline from the estimated Q values
