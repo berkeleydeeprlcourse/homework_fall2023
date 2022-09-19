@@ -63,10 +63,10 @@ class PGAgent(BaseAgent):
 
         # Case 1: trajectory-based PG
         # Estimate Q^{pi}(s_t, a_t) by the total discounted reward summed over entire trajectory
-        
-        # Note: q_values should be a 2D numpy array where the first
-        # dimension corresponds to trajectories and the second corresponds
-        # to timesteps
+
+        # Note: q_values should first be a 2D list where the first dimension corresponds to 
+        # trajectories and the second corresponds to timesteps, 
+        # then flattened to a 1D numpy array.
 
         if not self.reward_to_go:
             TODO
