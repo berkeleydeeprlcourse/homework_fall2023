@@ -1,0 +1,10 @@
+mujoco==2.2.0
+gym==0.25.2
+tensorboardX==2.5.1
+moviepy==1.0.3
+pyvirtualdisplay==3.0
+torch==1.12.1
+opencv-python==4.6.0.66
+swig==4.0.2
+box2d-py==2.3.8
+pyglet==1.5.26
