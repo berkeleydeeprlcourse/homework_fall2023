@@ -53,7 +53,7 @@ class DQNAgent(object):
         # TODO use epsilon greedy exploration when selecting action
         perform_random_action = TODO
         if perform_random_action:
-            # HINT: take random action 
+            # HINT: take random action (can sample from self.env.action_space)
                 # with probability eps (see np.random.random())
                 # OR if your current step number (see self.t) is less that self.learning_starts
             action = TODO
