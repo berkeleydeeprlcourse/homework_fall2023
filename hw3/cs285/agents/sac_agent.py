@@ -45,7 +45,7 @@ class SACAgent(BaseAgent):
         self.training_step = 0
         self.replay_buffer = ReplayBuffer(max_size=100000)
 
-    def update_critic(self):
+    def update_critic(self, ob_no, ac_na, next_ob_no, re_n, terminal_n):
         # TODO: 
         # 1. Compute the target Q value. 
         # HINT: You need to use the entropy term (alpha)
