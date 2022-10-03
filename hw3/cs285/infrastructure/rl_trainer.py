@@ -199,7 +199,7 @@ class RL_Trainer(object):
     ####################################
     ####################################
 
-def run_sac_training_loop(self, n_iter, collect_policy, eval_policy):
+    def run_sac_training_loop(self, n_iter, collect_policy, eval_policy):
         """
         :param n_iter:  number of (dagger) iterations
         :param collect_policy:
