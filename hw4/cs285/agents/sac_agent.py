@@ -54,4 +54,4 @@ class SACAgent(BaseAgent):
         self.replay_buffer.add_rollouts(paths)
 
     def sample(self, batch_size):
-        return self.replay_buffer.sample_recent_data(batch_size)
+        return self.replay_buffer.sample_random_data(batch_size)
