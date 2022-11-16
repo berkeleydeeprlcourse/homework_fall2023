@@ -96,7 +96,7 @@ class AWACAgent(DQNAgent):
 
 
             # TODO: Run Exploration Model #
-            # Evaluate the exploration model on s' to get the exploration bonus
+            # Evaluate the exploration model on s to get the exploration bonus
             # HINT: Normalize the exploration bonus, as RND values vary highly in magnitude
             expl_bonus = None
 
