@@ -13,7 +13,7 @@ A. (Recommended) Install with conda:
 
 	2. Create a conda environment that will contain python 3:
 	```
-	conda create -n cs285 python=3.7
+	conda create -n cs285 python=3.9
 	```
 
 	3. activate the environment (do this every time you open a new terminal and want to run code):
