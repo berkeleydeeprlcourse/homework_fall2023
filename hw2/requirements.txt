@@ -1,3 +1,4 @@
+swig==4.0.2
 mujoco==2.2.0
 gym[box2d,classic_control]==0.25.2
 tensorboard==2.10.0
@@ -9,4 +10,3 @@ pyvirtualdisplay==3.0
 torch==1.13.1
 opencv-python==4.6.0.66
 ipdb==0.13.9
-swig==4.0.2
