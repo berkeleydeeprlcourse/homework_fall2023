@@ -64,9 +64,9 @@ class PGAgent(nn.Module):
         # step 1: calculate Q values of each (s_t, a_t) point, using rewards (r_0, ..., r_t, ..., r_T)
         q_values: Sequence[np.ndarray] = self._calculate_q_vals(rewards)
 
-        # TODO: flatten the lists of arrays into 1D arrays, so that the rest of the code can be written in a vectorized
-        # way. obs, actions, rewards, terminals, and q_values should all be 1D arrays of the same length beyond this
-        # point.
+        # TODO: flatten the lists of arrays into single arrays, so that the rest of the code can be written in a vectorized
+        # way. obs, actions, rewards, terminals, and q_values should all be arrays with a leading dimension of `batch_size`
+        # beyond this point.
 
         # step 2: calculate advantages from Q values
         advantages: np.ndarray = self._estimate_advantage(
