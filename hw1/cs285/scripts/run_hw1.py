@@ -43,6 +43,7 @@ def run_training_loop(params):
 
     # Get params, create logger, create TF session
     logger = Logger(params['logdir'])
+    full_logs = []
 
     # Set random seeds
     seed = params['seed']
@@ -112,6 +113,7 @@ def run_training_loop(params):
     # init vars at beginning of training
     total_envsteps = 0
     start_time = time.time()
+    do_render = (params['video_log_freq'] != -1)
 
     for itr in range(params['n_iter']):
         print("\n\n********** Iteration %i ************"%itr)
@@ -132,7 +134,10 @@ def run_training_loop(params):
             # TODO: collect `params['batch_size']` transitions
             # HINT: use utils.sample_trajectories
             # TODO: implement missing parts of utils.sample_trajectory
-            paths, envsteps_this_batch = TODO
+            # TODO: change render from False to True
+            paths = utils.sample_n_trajectories(env, actor, 
+              int(params['batch_size']), int(params['ep_len']), do_render)
+            envsteps_this_batch = sum(utils.get_pathlength(path) for path in paths)
 
             # relabel the collected obs with actions from a provided expert policy
             if params['do_dagger']:
@@ -141,7 +146,8 @@ def run_training_loop(params):
                 # TODO: relabel collected obsevations (from our policy) with labels from expert policy
                 # HINT: query the policy (using the get_action function) with paths[i]["observation"]
                 # and replace paths[i]["action"] with these expert labels
-                paths = TODO
+                for path in paths:
+                  path["action"] = expert_policy.get_action(path["observation"])                 
 
         total_envsteps += envsteps_this_batch
         # add collected data to replay buffer
@@ -156,8 +162,12 @@ def run_training_loop(params):
           # HINT1: how much data = params['train_batch_size']
           # HINT2: use np.random.permutation to sample random indices
           # HINT3: return corresponding data points from each array (i.e., not different indices from each array)
-          # for imitation learning, we only need observations and actions.  
-          ob_batch, ac_batch = TODO
+          # for imitation learning, we only need observations and actions.
+          
+          # modified replay_buffer __len__()
+          assert(len(replay_buffer) == replay_buffer.obs.shape[0])
+          batch_idx = np.random.permutation(len(replay_buffer))[:int(params['train_batch_size'])]
+          ob_batch, ac_batch = replay_buffer.obs[batch_idx], replay_buffer.acs[batch_idx]
 
           # use the sampled data to train an agent
           train_log = actor.update(ob_batch, ac_batch)
@@ -168,8 +178,9 @@ def run_training_loop(params):
         if log_video:
             # save eval rollouts as videos in tensorboard event file
             print('\nCollecting video rollouts eval')
+            # TODO: change render from False to True
             eval_video_paths = utils.sample_n_trajectories(
-                env, actor, MAX_NVIDEO, MAX_VIDEO_LEN, True)
+                env, actor, MAX_NVIDEO, MAX_VIDEO_LEN, do_render)
 
             # save videos
             if eval_video_paths is not None:
@@ -199,11 +210,15 @@ def run_training_loop(params):
                 logger.log_scalar(value, key, itr)
             print('Done logging...\n\n')
 
+            full_logs.append(logs)
+
             logger.flush()
 
         if params['save_params']:
             print('\nSaving agent params')
             actor.save('{}/policy_itr_{}.pt'.format(params['logdir'], itr))
+
+    return full_logs
 
 
 def main():
