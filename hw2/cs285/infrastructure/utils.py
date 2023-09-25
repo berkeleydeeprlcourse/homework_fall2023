@@ -30,14 +30,17 @@ def sample_trajectory(
             )
 
         # TODO use the most recent ob and the policy to decide what to do
-        ac: np.ndarray = None
+        ac: np.ndarray = policy.get_action(ob)
+        # get the 1st batch
+        ac = ac[0]
+        # assert(ac.shape != ())
 
         # TODO: use that action to take a step in the environment
-        next_ob, rew, done, _ = None, None, None, None
+        next_ob, rew, done, _ = env.step(ac)
 
         # TODO rollout can end due to done, or due to max_length
         steps += 1
-        rollout_done: bool = None
+        rollout_done: bool = done or steps >= max_length
 
         # record result of taking that action
         obs.append(ob)
@@ -87,8 +90,10 @@ def sample_n_trajectories(
 ):
     """Collect ntraj rollouts."""
     trajs = []
-    for _ in range(ntraj):
+    for i in range(ntraj):
         # collect rollout
+        if i % 200 == 0:
+          print("[INFO] sample No.%d trajectory" % (i))
         traj = sample_trajectory(env, policy, max_length, render)
         trajs.append(traj)
     return trajs

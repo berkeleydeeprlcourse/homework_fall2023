@@ -15,11 +15,15 @@ from cs285.infrastructure import utils
 from cs285.infrastructure.logger import Logger
 from cs285.infrastructure.action_noise_wrapper import ActionNoiseWrapper
 
+
 MAX_NVIDEO = 2
 
 
 def run_training_loop(args):
     logger = Logger(args.logdir)
+    # params = vars(args)
+    do_render = (args.video_log_freq != -1)
+    full_logs = []
 
     # set random seeds
     np.random.seed(args.seed)
@@ -70,7 +74,9 @@ def run_training_loop(args):
         print(f"\n********** Iteration {itr} ************")
         # TODO: sample `args.batch_size` transitions using utils.sample_trajectories
         # make sure to use `max_ep_len`
-        trajs, envsteps_this_batch = None, None  # TODO
+        trajs = utils.sample_n_trajectories(env, agent.actor, args.batch_size, 
+                                            max_ep_len, do_render)
+        envsteps_this_batch = sum(utils.get_traj_length(traj) for traj in trajs)
         total_envsteps += envsteps_this_batch
 
         # trajs should be a list of dictionaries of NumPy arrays, where each dictionary corresponds to a trajectory.
@@ -78,7 +84,11 @@ def run_training_loop(args):
         trajs_dict = {k: [traj[k] for traj in trajs] for k in trajs[0]}
 
         # TODO: train the agent using the sampled trajectories and the agent's update function
-        train_info: dict = None
+        # TODO: use replay buffer?
+        train_info: dict = agent.update(trajs_dict["observation"], 
+                                        trajs_dict["action"],
+                                        trajs_dict["reward"],
+                                        trajs_dict["terminal"])
 
         if itr % args.scalar_log_freq == 0:
             # save eval metrics
@@ -102,7 +112,7 @@ def run_training_loop(args):
                 print("{} : {}".format(key, value))
                 logger.log_scalar(value, key, itr)
             print("Done logging...\n\n")
-
+            full_logs.append(logs)
             logger.flush()
 
         if args.video_log_freq != -1 and itr % args.video_log_freq == 0:
@@ -119,8 +129,14 @@ def run_training_loop(args):
                 video_title="eval_rollouts",
             )
 
+    return full_logs
+
 
 def main():
+    # import importlib
+    # importlib.reload(cs285.networks.policies)
+    # print("Reloading")
+    
     import argparse
 
     parser = argparse.ArgumentParser()
