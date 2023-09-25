@@ -3,7 +3,7 @@
 # Syncs the `data` directory, which contains the results of your training runs, from the remote instance to your local
 # machine.
 
-export ZONE="us-west1-b"
+export ZONE="us-west3-b"
 export INSTANCE_NAME="cs285"
 
 echo "Starting instance..."

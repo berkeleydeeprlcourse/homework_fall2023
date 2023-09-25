@@ -5,6 +5,7 @@ from cs285.agents.pg_agent import PGAgent
 
 import os
 import time
+import pickle
 
 import gym
 import numpy as np
@@ -196,7 +197,9 @@ def main():
     if not (os.path.exists(logdir)):
         os.makedirs(logdir)
 
-    run_training_loop(args)
+    full_logs = run_training_loop(args)
+    with open(os.path.join(data_path, 'full_logs.pkl'), 'wb') as f:
+        pickle.dump(full_logs, f)
 
 
 if __name__ == "__main__":
