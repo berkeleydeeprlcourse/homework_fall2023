@@ -1,0 +1,5 @@
+base_config: sac
+env_name: Pendulum-v1
+exp_name: sanity_pendulum
+use_entropy_bonus: true
+temperature: 0.1

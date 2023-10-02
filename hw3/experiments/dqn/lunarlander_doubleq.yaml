@@ -1,0 +1,5 @@
+base_config: dqn_basic
+env_name: LunarLander-v2
+
+target_update_period: 1000
+use_double_q: true
