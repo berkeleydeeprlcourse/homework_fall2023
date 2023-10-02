@@ -1,2 +1,1 @@
-1) See hw1 if you'd like to see installation instructions. You do NOT have to redo them.
-2) See the PDF for the rest of the instructions.
+See the [assignment document](https://rail.eecs.berkeley.edu/deeprlcourse/deeprlcourse/static/homeworks/hw3.pdf) for instructions.
