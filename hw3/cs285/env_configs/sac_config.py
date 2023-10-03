@@ -22,7 +22,7 @@ def sac_config(
     num_layers: int = 3,
     actor_learning_rate: float = 3e-4,
     critic_learning_rate: float = 3e-4,
-    total_steps: int = 1000000,
+    total_steps: int = 300000,
     random_steps: int = 5000,
     training_starts: int = 10000,
     batch_size: int = 128,
