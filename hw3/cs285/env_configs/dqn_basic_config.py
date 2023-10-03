@@ -20,7 +20,7 @@ def basic_dqn_config(
     hidden_size: int = 64,
     num_layers: int = 2,
     learning_rate: float = 1e-3,
-    total_steps: int = 1000000,
+    total_steps: int = 300000,
     discount: float = 0.99,
     target_update_period: int = 1000,
     clip_grad_norm: Optional[float] = None,
