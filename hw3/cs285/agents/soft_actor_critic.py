@@ -206,15 +206,6 @@ class SoftActorCritic(nn.Module):
                 batch_size,
             ), next_qs.shape
 
-            # Compute the target Q-value
-            target_values: torch.Tensor = reward[None] + self.discount * next_qs * (
-                1 - 1.0 * done[None]
-            )
-            assert target_values.shape == (
-                self.num_critic_networks,
-                batch_size,
-            ), target_values.shape
-
             if self.use_entropy_bonus and self.backup_entropy:
                 # TODO(student): Add entropy bonus to the target values for SAC
                 next_action_entropy = ...
