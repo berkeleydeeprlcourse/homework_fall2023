@@ -95,6 +95,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
 
         # TODO(student): Step the environment
 
+        next_observation = np.asarray(next_observation)
         truncated = info.get("TimeLimit.truncated", False)
 
         # TODO(student): Add the data to the replay buffer
