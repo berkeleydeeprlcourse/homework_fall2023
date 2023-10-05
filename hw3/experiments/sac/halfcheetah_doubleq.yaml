@@ -1,0 +1,26 @@
+# Use double-Q learning
+num_critic_networks: 2
+target_critic_backup_type: doubleq
+
+exp_name: doubleq
+
+# All these are the same as from the last problem...
+base_config: sac
+env_name: HalfCheetah-v4
+
+total_steps: 1000000
+random_steps: 5000
+training_starts: 10000
+
+batch_size: 128
+replay_buffer_capacity: 1000000
+
+discount: 0.99
+use_soft_target_update: true
+soft_target_update_rate: 0.005
+
+actor_gradient_type: reparametrize
+num_critic_updates: 1
+
+use_entropy_bonus: true
+temperature: 0.1
