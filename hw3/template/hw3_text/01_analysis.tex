@@ -12,7 +12,7 @@
 \def\D{\mathcal{D}}
 
 Consider the $N$-step variant of Q-learning described in lecture. We learn $\Qn$ with the following updates:\begin{align}
-  y_{j,t} &\gets \biggl(\;\sum_{t'=t}^{t+N-1} \gamma^{t-t'} r_{j,t'}\biggr)+\gamma^{N} \max _{\mathbf{a}_{j,t+N}} \Q\left(\mathbf{s}_{j,t+N}, \mathbf{a}_{j,t+N}\right) \label{eq:q_target}\\
+  y_{j,t} &\gets \biggl(\;\sum_{t'=t}^{t+N-1} \gamma^{t'-t} r_{j,t'}\biggr)+\gamma^{N} \max _{\mathbf{a}_{j,t+N}} \Q\left(\mathbf{s}_{j,t+N}, \mathbf{a}_{j,t+N}\right) \label{eq:q_target}\\
   \phi_{k+1} &\gets \underset{\phi\in\Phi}{\arg\min}  \sum_{j,t} \bigl( y_{j,t}-Q_{\phi}(\mathbf s_{j,t},\mathbf a_{j,t}) \bigr)^2 \label{eq:q_update}
 \end{align}
 In these equations, $j$ indicates an index in the replay buffer of trajectories $\D_k$. We first roll out a batch of $B$ trajectories to update $\D_k$ and compute the target values in \eqref{eq:q_target}. We then fit $\Qn$ to these target values with \eqref{eq:q_update}. 
