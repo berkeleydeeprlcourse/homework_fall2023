@@ -1,0 +1,143 @@
+\usepackage{xcolor}
+\usepackage{titleps}
+\usepackage[letterpaper, margin=0.95in]{geometry}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{tabu}
+\usepackage{parskip}
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{forest}
+\usepackage{hyperref}
+\usepackage[color=red]{todonotes}
+\usepackage{forest}
+\definecolor{light-yellow}{HTML}{FFE5CC}
+\usepackage{cleveref}
+
+\newcommand{\xb}{\mathbf{x}}
+\newcommand{\yb}{\mathbf{y}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\tr}{^T}
+\newcommand{\hb}{\mathbf{h}}
+\newcommand{\Hb}{\mathbf{H}}
+
+\DeclareFontShape{OT1}{cmtt}{bx}{n}{<5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+\newpagestyle{ruled}
+{\sethead{Berkeley CS 285}{Deep Reinforcement Learning, Decision Making, and Control}{Fall 2022}\headrule
+  \setfoot{}{\ifsolutions\LARGE\bf\textcolor{red}{Answer Key}\fi}{}}
+\pagestyle{ruled}
+
+\renewcommand\makeheadrule{\color{black}\rule[-.75\baselineskip]{\linewidth}{0.4pt}}
+\renewcommand*\footnoterule{}
+
+\begin{document}
+\lstset{basicstyle = \ttfamily,columns=fullflexible,
+backgroundcolor = \color{light-yellow}
+}
+
+\begin{centering}
+    {\Large Assignment 3: Q-Learning and Actor-Critic Algorithms} \\
+    \vspace{.25cm}
+    \textbf{Due October 18, 11:59 pm} \\
+\end{centering}
+
+\input{hw3_text/01_analysis}
+\input{hw3_text/02_dqn}
+\input{hw3_text/04_sac}
+
+\section{Submitting the code and experiment runs}
+In order to turn in your code and experiment logs, create a folder that contains the following: 
+\begin{itemize}
+    \item A folder named \texttt{data} with all the experiment runs from this assignment.
+    % For Q-learning, you need to submit one run for Q1, two runs for Q2, and three runs for Q3. These folders can be copied directly from the \texttt{data} folder. For the actor critic section, likewise submit one folder for each run.
+    \textbf{Do not change the names originally assigned to the folders, as specified by  \texttt{exp\_name} in the instructions. Video logging is disabled by default in the code, but if you turned it on for debugging, you will need to run those again with \texttt{--video\_log\_freq -1}, or else the file size will be too large for submission.}
+    \item The \texttt{cs285} folder with all the \texttt{.py} files, with the same names and directory structure as the original homework repository (excluding the \texttt{data} folder). Also include any special instructions we need to run in order to produce each of your figures or tables (e.g. ``run python myassignment.py -sec2q1'' to generate the result for Section 2 Question 1) in the form of a README file.
+    % Note that this assignment’s plotting must be done in a python script, such that running a single script like this can generate the plot.
+\end{itemize}
+
+As an example, the unzipped version of your submission should result in the following file structure. \textbf{Make sure that the submit.zip file is below 15MB and that they include the prefix \texttt{q1\_}, \texttt{q2\_}, \texttt{q3\_}, etc.}
+
+\begin{forest}
+  for tree={
+    font=\ttfamily,
+    grow'=0,
+    child anchor=west,
+    parent anchor=south,
+    anchor=west,
+    calign=first,
+    edge path={
+      \noexpand\path [draw, \forestoption{edge}]
+      (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+    },
+    before typesetting nodes={
+      if n=1
+        {insert before={[,phantom]}}
+        {}
+    },
+    fit=band,
+    before computing xy={l=15pt},
+  }
+[submit.zip
+  [data
+      [hw3\_dqn\_...
+        [events.out.tfevents.1567529456.e3a096ac8ff4]
+      ]
+      [hw3\_sac\_...
+        [events.out.tfevents.1567529456.e3a096ac8ff4]
+        % [checkpoint]
+        % [policy\_itr\_0.data-00000-of-00001]
+        % [...]
+      ]
+      [...]
+  ]
+  [cs285
+    [agents
+        [soft\_actor\_critic.py]
+        [dqn\_agent.py]
+    ]
+    [...]
+  ]
+[README.md]
+    [...]
+]
+\end{forest}
+% \todo{tree probably needs to be updated}
+% \end{question}
+
+If you are a Mac user, \textbf{do not use the default ``Compress'' option to create the zip}. It creates artifacts that the autograder does not like. You may use \texttt{zip -vr submit.zip . -x "*.DS\_Store"} from your terminal from within the top-level \verb|cs285| directory.
+
+Turn in your assignment on Gradescope. Upload the zip file with your code and log files to \textbf{HW3 Code}, and upload the PDF of your report to \textbf{HW3}.
+
+\newpage 
+
+\paragraph{SAC-related questions.} 
+We wanted to address some of the common questions that have been asked regarding Question 6 of the HW. The full algorithm for SAC is summarized below, the equations listed in this paper will be helpful for you: {\url{https://arxiv.org/pdf/1812.05905}}. Some definitions that will be useful:
+\begin{enumerate}
+    \item What is alpha and how to update it: Alpha is the entropy regularization coefficient denoting how much exploration to add to the policy. You should update based on Eq. 18 in Section 5 in the above paper as follows: 
+    $$
+    J(\alpha)=\mathop{\mathbb{E}}_{a_t \sim \pi_t}[-\alpha\log_{\pi_t}(a_t|s_t) - \alpha\bar{\mathcal{H}}].
+    $$
+    \item Target entropy is the negative of the action space dimension that is used to update the alpha term.
+    \item SquashedNorm: This is a function that takes in mean and std as in previous homeworks, and will give you a distribution that you can sample your action from. 
+    \item To update the critic, refer to how to update Q-function parameters in Equation 6 of the paper above as follows: \\
+    $$J_{Q}(\theta) = Q_{\theta}(s_t, a_t) - (r(s_t, a_t) + \gamma (Q_{\bar{\theta}}(s_{t+1}, a_{t+1}) - \alpha \log(\pi_{\phi}(a_{t+1}, s_{t+1})))$$
+    \item To update the policy, follow Equation 18: \\
+    $$J(\alpha) = E_{a_t \sim \pi_t} [- \alpha \log \pi_{t}(a_t|s_t) - \alpha \bar{\mathcal{H}}]$$
+    \item You don't need to alter any parameters from the SAC run commands. The correct implementation should work with the provided default parameters.
+    
+\end{enumerate}
+
+
+\end{document}

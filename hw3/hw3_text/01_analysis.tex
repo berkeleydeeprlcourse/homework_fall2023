@@ -1,0 +1,161 @@
+\section{Multistep Q-Learning}
+
+\ifsolutions
+\input{hw3_solutions/01_solutions}
+\fi
+
+\def\solve#1{\csname solution to #1\endcsname}
+
+\begingroup
+\def\Q{Q_{\phi_k}}
+\def\Qn{Q_{\phi_{k+1}}}
+\def\D{\mathcal{D}}
+
+Consider the $N$-step variant of Q-learning described in lecture. We learn $\Qn$ with the following updates:\begin{align}
+  y_{j,t} &\gets \biggl(\;\sum_{t'=t}^{t+N-1} \gamma^{t-t'} r_{j,t'}\biggr)+\gamma^{N} \max _{\mathbf{a}_{j,t+N}} \Q\left(\mathbf{s}_{j,t+N}, \mathbf{a}_{j,t+N}\right) \label{eq:q_target}\\
+  \phi_{k+1} &\gets \underset{\phi\in\Phi}{\arg\min}  \sum_{j,t} \bigl( y_{j,t}-Q_{\phi}(\mathbf s_{j,t},\mathbf a_{j,t}) \bigr)^2 \label{eq:q_update}
+\end{align}
+In these equations, $j$ indicates an index in the replay buffer of trajectories $\D_k$. We first roll out a batch of $B$ trajectories to update $\D_k$ and compute the target values in \eqref{eq:q_target}. We then fit $\Qn$ to these target values with \eqref{eq:q_update}. 
+After estimating $\Qn$, we can then update the policy through an argmax:\begin{align}
+  \pi_{k+1}\left(\mathbf{a}_{t} \mid \mathbf{s}_{t}\right)\gets \left\{\begin{array}{l}1 \text { if } \mathbf{a}_{t}=\arg \max _{\mathbf{a}_{t}} Q_{\phi_{k+1}}\left(\mathbf{s}_{t}, \mathbf{a}_{t}\right) \\ 0 \text{ otherwise. }\end{array}\right. \label{eq:policy_improvement}
+\end{align}
+We repeat the steps in \cref{eq:q_target,eq:q_update,eq:policy_improvement} $K$ times to improve the policy. In this question, you will analyze some properties of this algorithm, which is summarized in \Cref{alg:multi}.
+
+\begin{algorithm}
+\caption{Multistep Q-Learning}
+\label{alg:multi}
+\begin{algorithmic}[1]
+	\Require{iterations $K$, batch size $B$}
+	\State initialize random policy $\pi_0$, sample $\phi_0\sim\Phi$
+	\For{$k=0\ldots K-1$}
+		\State Update $\D_{k+1}$ with $B$ new rollouts from $\pi_k$ \label{eq:data}
+		\State compute targets with \eqref{eq:q_target}
+		\State $Q_{\phi_{k+1}} \gets$ update with \eqref{eq:q_update}
+		\State $\pi_{k+1} \gets$ update with \eqref{eq:policy_improvement}
+	\EndFor
+	\State\Return $\pi_{K}$
+\end{algorithmic}	
+\end{algorithm}
+
+
+
+\def\makecols#1#2{{\def\p{#2}\newcount\i\i0\hfill\loop\advance\i1\makebox[1cm][c]{\expandafter\p\the\i}\kern.5cm\ifnum\i<#1\repeat\kern-1cm}}
+\def\heading#1{\bf\expandafter\uppercase\expandafter{\romannumeral#1.}}
+\def\boxes#1{\ensuremath\square}
+\def\filled#1#2|#3{\ifnum#1=#3\ensuremath\blacksquare
+	\else\if\relax#2\relax\ensuremath\square
+	\else\filled#2|#3\fi\fi}
+\def\ncol{3}
+\newcommand{\checkeditem}[2]{\edef\x{0#1}\item[\expandafter\filled\x|#2]}
+
+
+\def\choices#1#2{
+	\begin{enumerate}
+	\item on-policy in tabular setting \makecols\ncol{\filled0#1|}
+	\item off-policy in tabular setting \makecols\ncol{\filled0#2|}
+	\end{enumerate}
+}
+
+\subsection{TD-Learning Bias (2 points)}
+\label{q:td_bias}
+
+\def\answer{}
+\ifsolutions\solve\thesubsection\fi
+We say an estimator $f_\D$ of $f$ constructed using data $\D$ sampled from process $P$ is \textit{unbiased} when $\mathbb{E}_{\D\sim P}[f_\D(x)-f(x)]=0$ at each $x$.
+
+Assume $\hat Q$ is a noisy (but unbiased) estimate for $Q$. Is the Bellman backup $\mathcal{B}\hat Q = r(s, a) + \gamma \max_{a'} \hat Q(s', a')$ an unbiased estimate of $\mathcal{B}Q$?
+\begin{itemize}
+    \checkeditem\answer1 Yes
+    \checkeditem\answer2 No
+\end{itemize}
+
+\subsection{Tabular Learning (5 points total)}
+\label{q:tabular_learning}
+
+At each iteration of the algorithm above after the update from \cref{eq:q_update}, $\Q$ can be viewed as an estimate of the true optimal $Q^*$. Consider the following statements: 
+\begin{enumerate}[label=\bf\Roman*.]
+  \item $Q_{\phi_{k+1}}$ is an unbiased estimate of the $Q$ function of the last policy, $Q^{\pi_k}$.
+  \item As $k\to\infty$ for some fixed $B$, $\Q$ is an unbiased estimate of $Q^*$, i.e., $\lim_{k\to\infty} \mathbb{E}\bigl[\Q(s,a)-Q^*(s,a)]=0$.
+  \item In the limit of infinite iterations and data we recover the optimal $Q^*$, i.e., $\lim_{k,B\to\infty}\mathbb{E}\,\bigl[\|\Q-Q^*\|_\infty\bigr]=0$.
+\end{enumerate}
+
+We make the additional assumptions: 
+\begin{itemize}
+	\item The state and action spaces are finite.
+	\item Every batch contains at least one experience for each action taken in each state.
+	\item In the tabular setting, $\Q$ can express any function, i.e., $\{\Q:\phi\in\Phi\}=\mathbb{R}^{S\times A}$.
+\end{itemize}
+When updating the buffer $\D_k$ with $B$ new trajectories in \cref{eq:data} of \Cref{alg:multi}, we say:
+\begin{itemize}
+    \item When learning \textit{on-policy}, $\D_k$ is set to contain only the set of $B$ new rollouts of $\pi$ (so $\lvert \D_k \rvert = B$). Thus, we only train on rollouts from the current policy.
+	\item When learning \textit{off-policy}, we use a fixed dataset $\D_k=\D$ of $B$ trajectories from another policy $\pi'$. 
+\end{itemize}
+
+Indicate which of the statements \textbf{I-III} always hold in the following cases. No justification is required.
+\ifsolutions\solve\thesubsection\else
+\begin{enumerate}
+\item $N=1$ and \ldots \makecols\ncol\heading\choices
+	{} % <--- TODO: select numbers of boxes to fill; e.g., {13} to select I and III
+	{} % <--- TODO: "
+\item $N>1$ and \ldots \choices
+	{} % <--- TODO: "
+	{} % <--- TODO: "
+\item In the limit as $N\to\infty$ (no bootstrapping) \ldots \choices
+	{} % <--- TODO: "
+	{} % <--- TODO: "
+\end{enumerate}
+\fi
+
+\subsection{Variance of $Q$ Estimate (2 points)}
+\label{q:variance_estimate}
+Which of the three cases ($N = 1$, $N > 1$, $N \to \infty$) would you expect to have the highest-variance estimate of $Q$ for fixed dataset size $B$ in the limit of infinite iterations $k$? Lowest-variance?
+
+\def\highest{} % <--- TODO: insert index of highest variance answer
+\def\lowest{} % <--- TODO: insert index of lowest variance answer
+\ifsolutions\solve\thesubsection\fi
+\begin{minipage}{0.49\linewidth}
+Highest variance:\smallskip
+\begin{itemize}\itemsep=1ex
+    \checkeditem\highest1 $N = 1$
+    \checkeditem\highest2 $N > 1$
+    \checkeditem\highest3 $N \to \infty$
+\end{itemize}
+\end{minipage}
+\begin{minipage}{0.49\linewidth}
+Lowest variance:\smallskip
+\begin{itemize}\itemsep=1ex
+    \checkeditem\lowest1 $N = 1$
+    \checkeditem\lowest2 $N > 1$
+    \checkeditem\lowest3 $N \to \infty$
+\end{itemize}
+\end{minipage}
+
+\subsection{Function Approximation (1 point)}
+\label{q:function_approximation}
+Now say we want to represent $Q$ via function approximation rather than with a tabular representation. Assume that for any deterministic policy $\pi$ (including the optimal policy $\pi^*$), function approximation can represent the true $Q^\pi$ exactly.
+Which of the following statements are true?
+
+\def\answer{} % <--- TODO: insert index of answer(s)
+\ifsolutions\solve\thesubsection\fi
+\begin{itemize}
+    \checkeditem\answer1 When $N = 1$, $Q_{\phi_{k+1}}$ is an unbiased estimate of the $Q$-function of the last policy $Q^{\pi_k}$.
+    \checkeditem\answer2 When $N = 1$ and in the limit as $B\to\infty,\,k \to \infty$, $\Q$ converges to $Q^*$.
+    \checkeditem\answer3 When $N > 1$ (but finite) and in the limit as $B\to\infty,\,k \to \infty$, $\Q$ converges to $Q^*$.
+    \checkeditem\answer4 When $N \to \infty$ and in the limit as $B \to \infty,\,k \to \infty$, $\Q$ converges to $Q^*$.
+\end{itemize}
+
+\subsection{Multistep Importance Sampling (5 points)}
+\label{q:importance_sampling}
+
+We can use importance sampling to make the $N$-step update work off-policy with trajectories drawn from an arbitrary policy. Rewrite \eqref{eq:q_update} to correctly approximate a $\Q$ that improves upon $\pi$ when it is trained on data $\D$ consisting of $B$ rollouts of some other policy $\pi'(\mathbf a_t\mid\mathbf s_t)$. 
+
+Do we need to change \eqref{eq:q_update} when $N=1$? What about as $N\to\infty$? 
+
+You may assume that $\pi'$ always assigns positive mass to each action. [Hint: re-weight each term in the sum using a ratio of likelihoods from the policies $\pi$ and $\pi'$.]
+
+ 
+\ifsolutions\solve\thesubsection\else
+% TODO: answer question above
+\fi
+
+\endgroup

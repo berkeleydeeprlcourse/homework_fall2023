@@ -1,0 +1,75 @@
+\section{On-Policy Actor-Critic}
+\subsection{Introduction}
+
+DQN works well in discrete action spaces. In continuous action spaces, though, calculating target values requires maximizing $Q_{\phi'}(s', a')$ over \textit{all} values of $a'$!
+
+Actor-critic methods are one way to deal with this limitation. In this framework, we have a \textit{parametrized} policy $\pi$ that gives us actions directly (rather than defining it implicitly by maximizing over $Q$-values). We can implement this in a very similar way to our policy gradient implementation from the previous homework:
+\begin{align*}
+\nabla_\theta J(\theta) &\approx \frac{1}{N} \sum_{i=1}^N \sum_{t=1}^T \nabla_\theta \log \pi_\theta(a_{it} | s_{it})\left(\left(\sum_{t'=t}^T \gamma^{t'-t} r(s_{it'}, a_{it'})\right) - V_\phi^\pi\left(s_{it}\right)\right).
+\end{align*}
+
+In this formulation, we estimate the Q function by taking the sum of rewards to go over each trajectory, and we subtract the value function baseline to obtain the advantage $$A^\pi(s_{t}, a_{t}) \approx \left(\sum_{t'=t}^T \gamma^{t'-t} r(s_{t'}, a_{t'})\right) - V_\phi^\pi\left(s_{t}\right)$$
+
+In practice, the estimated advantage value suffers from high variance. Actor-critic addresses this issue by using a \textit{critic network} to estimate the sum of rewards to go. The most common type of critic network used is a value function, in which case our estimated advantage becomes
+$$A^\pi(s_{t}, a_{t}) \approx r(s_{t}, a_{t}) + \gamma V_\phi^\pi\left(s_{t+1}\right) - V_\phi^\pi\left(s_{t}\right)$$
+(Note that this also coincides with GAE with $\lambda = 0$.)
+
+One additional consideration in actor-critic is updating the critic network itself. While we can use Monte Carlo rollouts to estimate the sum of rewards to go for updating the value function network (as we did in HW2), we can also \textit{bootstrap} our estimate by fitting it to the following \textit{target values}:
+$$y_t = r(s_t, a_t) + \gamma V^\pi(s_{t+1})$$
+we then regress onto these target values via the following regression objective which we can optimize with gradient descent:
+$$\min_{\phi} \sum_{i,t} (V_{\phi}^\pi(s_{it}) - y_{it})^2$$
+In theory, we need to perform this minimization every time we update our policy, so that our value function matches the behavior of the new policy. In practice however, this operation can be costly, so we may instead just take a few gradient steps at each iteration. Also note that since our target values are based on the old value function, we may need to recompute the targets with the updated value function, in the following fashion:
+\begin{enumerate}
+    \item Update targets with current value function
+    \item Regress onto targets to update value function by taking a few gradient steps
+    \item Redo steps 1 and 2 several times
+\end{enumerate}
+In all, the process of fitting the value function critic is an iterative process in which we go back and forth between computing target values and updating the value function to match the target values. Through experimentation, you will see that this iterative process is crucial for training the critic network.
+
+\subsection{Implementation}
+
+Your code will build off your solutions from homework 2. You will need to fill in the TODOS for the following parts of the code.
+
+\begin{itemize}
+    \item {\color{red} TODO}
+\end{itemize}
+ 
+\subsection{Evaluation}
+
+Once you have a working implementation of actor-critic, you should prepare a report. The report should consist of figures for the question below. You should turn in the report as one PDF (same PDF as part 1) and a zip file with your code (same zip file as part 1). If your code requires special instructions or dependencies to run, please include these in a file called \verb+README+ inside the zip file.
+
+\paragraph{Question 4: Sanity check with Pendulum-v1}
+Now that you have implemented actor-critic, check that your solution works by running Cartpole-v0. \\
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name Pendulum-v1 -n 100 -b 1000 --exp_name q4_ac_1_1 -ntu 1 -ngsptu 1
+\end{lstlisting}
+In the example above, we alternate between performing one target update and one gradient update step for the critic. As you will see, this probably doesn't work, and you need to increase both the number of target updates and number of gradient updates. Compare the results for the following settings and report which worked best. Do this by plotting all the runs on a single plot and writing your takeaway in the caption.
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name CartPole-v0 -n 100 -b 1000 --exp_name q4_100_1 -ntu 100 -ngsptu 1
+\end{lstlisting}
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name CartPole-v0 -n 100 -b 1000 --exp_name q4_1_100 -ntu 1 -ngsptu 100
+\end{lstlisting}
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name CartPole-v0 -n 100 -b 1000 --exp_name q4_10_10 -ntu 10 -ngsptu 10
+\end{lstlisting}
+At the end, the best setting from above should match the policy gradient results from Cartpole in hw2 (200).
+
+\paragraph{Question 5: Run actor-critic with more difficult tasks}
+Use the best setting from the previous question to run InvertedPendulum and HalfCheetah:
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name InvertedPendulum-v4 --ep_len 1000 --discount 0.95 -n 100 -l 2 -s 64 -b 5000 -lr 0.01 --exp_name q5_<ntu>_<ngsptu> -ntu <> -ngsptu <>
+\end{lstlisting}
+where \texttt{<ntu>\_<ngsptu>} is replaced with the parameters you chose.
+
+\begin{lstlisting}[language=bash,breaklines=true]
+python cs285/scripts/run_hw3_actor_critic.py --env_name HalfCheetah-v4 --ep_len 150 --discount 0.90 --scalar_log_freq 1 -n 150 -l 2 -s 32 -b 30000 -eb 1500 -lr 0.02 --exp_name q5_<ntu>_<ngsptu> -ntu <> -ngsptu <>
+\end{lstlisting}
+Your results should roughly match those of policy gradient.
+After 150 iterations, your HalfCheetah return should be around 150.
+After 100 iterations, your InvertedPendulum return should be around 1000.
+Your deliverables for this section are plots with the eval returns for both enviornments.
+
+As a debugging tip, the returns should start going up immediately.
+For example, after 20 iterations, your HalfCheetah return should be above -40 and your InvertedPendulum return should near or above 100.
+However, there is some variance between runs, so the 150-iteration (for HalfCheetah) and 100-iteration (for InvertedPendulum) results are the numbers we use to grade.
