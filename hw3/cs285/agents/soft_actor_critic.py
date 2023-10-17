@@ -152,6 +152,8 @@ class SoftActorCritic(nn.Module):
             raise NotImplementedError
         elif self.target_critic_backup_type == "min":
             raise NotImplementedError
+        elif self.target_critic_backup_type == "mean":
+            raise NotImplementedError
         else:
             # Default, we don't need to do anything.
             pass
@@ -196,11 +198,6 @@ class SoftActorCritic(nn.Module):
             # (For double-Q, clip-Q, etc.)
             next_qs = self.q_backup_strategy(next_qs)
 
-            # Compute the target Q-value
-            target_values: torch.Tensor = ...
-
-            next_qs = self.q_backup_strategy(next_qs)
-
             assert next_qs.shape == (
                 self.num_critic_networks,
                 batch_size,
@@ -210,6 +207,13 @@ class SoftActorCritic(nn.Module):
                 # TODO(student): Add entropy bonus to the target values for SAC
                 next_action_entropy = ...
                 next_qs += ...
+
+            # Compute the target Q-value
+            target_values: torch.Tensor = ...
+            assert target_values.shape == (
+                self.num_critic_networks,
+                batch_size
+            )
 
         # TODO(student): Update the critic
         # Predict Q-values
