@@ -1,0 +1,11 @@
+env_name: cheetah-cs285-v0
+exp_name: cheetah_0iter
+
+base_config: mpc
+num_layers: 1
+hidden_size: 32
+
+num_iters: 1
+initial_batch_size: 20000
+num_agent_train_steps_per_iter: 500
+num_eval_trajectories: 0

@@ -1,0 +1,17 @@
+env_name: cheetah-cs285-v0
+exp_name: cheetah_cem
+
+base_config: mpc
+num_layers: 2
+hidden_size: 250
+
+num_iters: 5
+initial_batch_size: 5000
+batch_size: 5000
+num_agent_train_steps_per_iter: 1500
+num_eval_trajectories: 10
+mpc_horizon: 15
+mpc_strategy: cem
+cem_num_iters: 4
+cem_num_elites: 5
+cem_alpha: 1

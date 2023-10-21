@@ -1,0 +1,14 @@
+env_name: reacher-cs285-v0
+exp_name: reacher_multi
+
+base_config: mpc
+num_layers: 2
+hidden_size: 250
+
+num_iters: 15
+initial_batch_size: 5000
+batch_size: 5000
+num_agent_train_steps_per_iter: 1000
+num_eval_trajectories: 10
+mpc_horizon: 10
+mpc_strategy: random
