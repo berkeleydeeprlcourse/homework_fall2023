@@ -1,0 +1,10 @@
+base_config: "iql"
+env_name: "PointmassMedium-v0"
+exp_name: "pointmass_medium_iql"
+training_steps: 200000
+dataset_name: "pointmass_medium_rnd"
+expectile: 0.99
+temperature: 10.0
+
+hidden_size: 64
+num_layers: 2

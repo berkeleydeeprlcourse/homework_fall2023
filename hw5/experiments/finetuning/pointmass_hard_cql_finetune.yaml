@@ -1,0 +1,12 @@
+base_config: "cql"
+env_name: "PointmassHard-v0"
+exp_name: "pointmass_hard_cql"
+use_double_q: true
+total_steps: 200000
+offline_steps: 100000
+dataset_name: "pointmass_hard_rnd"
+
+cql_alpha: 1.0
+
+hidden_size: 64
+num_layers: 2

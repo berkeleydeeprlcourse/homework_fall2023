@@ -1,0 +1,11 @@
+base_config: "cql"
+env_name: "PointmassMedium-v0"
+exp_name: "pointmass_medium_cql"
+use_double_q: true
+training_steps: 100000
+dataset_name: "pointmass_medium_random"
+
+cql_alpha: 0.1
+
+hidden_size: 64
+num_layers: 2

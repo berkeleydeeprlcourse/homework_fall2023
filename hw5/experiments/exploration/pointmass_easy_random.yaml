@@ -1,0 +1,5 @@
+base_config: "random"
+env_name: "PointmassEasy-v0"
+exp_name: "pointmass_easy_random"
+dataset_name: "pointmass_easy_random"
+total_steps: 10000
