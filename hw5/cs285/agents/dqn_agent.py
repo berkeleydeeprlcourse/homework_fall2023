@@ -47,6 +47,7 @@ class DQNAgent(nn.Module):
         observation = ptu.from_numpy(np.asarray(observation))[None]
 
         # TODO(student): get the action from the critic using an epsilon-greedy strategy
+        raise NotImplementedError
         action = ...
 
         return ptu.to_numpy(action).squeeze(0).item()
@@ -70,6 +71,7 @@ class DQNAgent(nn.Module):
 
         # TODO(student): paste in your code from HW3, and make sure the return values exist
         raise NotImplementedError
+        with torch.no_grad():
             next_qa_values = ...
 
             if self.use_double_q:
