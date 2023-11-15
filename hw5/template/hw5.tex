@@ -121,7 +121,7 @@ You may also assume access to the distributions $\pi(\a\mid\s)$ and $\pib(\a\mid
    	How can you extend your answer from part (\ref{q:kl}) to account for an arbitrary $f$-divergence? Your answer should be a more general alternate expression for $b(\s,\a)$ in terms of $f$.
 	\item Suppose $M$ has a finite horizon $H$ and we want to constrain divergence in the distribution of \emph{trajectories of states} under $\pi$ and $\pib$. We can express the KL divergence between the (state) trajectory distributions for $\tau=(\s_1,\s_2,\ldots,\s_H)$ as follows:
 	\begin{align*}
-	    D(\pi,\pib)&=\E_{\tau\sim\pi}D_{KL}[p_{\pi}(\tau)\|p_{\pib}(\tau)].
+	    D(\pi,\pib)&=D_{KL}[p_{\pi}(\tau)\|p_{\pib}(\tau)].
    	\end{align*} 
    	What expression for $b(\s,\a)$ enforces this constraint? You may assume access to the dynamics $p(\s'\mid\s,\a)$. [\emph{Hint: marginalize over actions to get a bonus $b(\s,\a,\s')$ that depends on $\s'$. How can this be converted to a bonus $b(\s,\a)$ that can be used with $r(\s,\a)$?}]
 
