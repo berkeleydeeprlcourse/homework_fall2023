@@ -3,7 +3,7 @@ env_name: "PointmassMedium-v0"
 exp_name: "pointmass_medium_cql"
 use_double_q: true
 training_steps: 100000
-dataset_name: "pointmass_medium_random"
+dataset_name: "pointmass_medium_rnd"
 
 cql_alpha: 0.1
 

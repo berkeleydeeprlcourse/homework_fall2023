@@ -3,7 +3,7 @@ env_name: "PointmassEasy-v0"
 exp_name: "pointmass_easy_cql"
 use_double_q: true
 training_steps: 100000
-dataset_name: "pointmass_easy_random"
+dataset_name: "pointmass_easy_rnd"
 
 cql_alpha: 0.1
 

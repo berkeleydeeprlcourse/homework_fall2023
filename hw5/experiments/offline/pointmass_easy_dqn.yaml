@@ -2,7 +2,7 @@ base_config: "dqn"
 env_name: "PointmassEasy-v0"
 exp_name: "pointmass_easy_dqn"
 training_steps: 100000
-dataset_name: "pointmass_easy_random"
+dataset_name: "pointmass_easy_rnd"
 
 hidden_size: 64
 num_layers: 2
