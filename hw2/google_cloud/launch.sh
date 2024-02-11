@@ -2,7 +2,7 @@
 
 # Launches a command on the remote instance. Ensures that your code is synchronized to the remote instance beforehand.
 
-export ZONE="us-west1-b"
+export ZONE="us-west4-a"
 export INSTANCE_NAME="cs285"
 
 echo "Starting instance..."

@@ -2,7 +2,7 @@
 
 # Creates a new GPU instance, transfers the code to it, and runs some installation steps.
 
-export ZONE="us-west1-b"
+export ZONE="us-west4-a"
 export INSTANCE_NAME="cs285"
 
 echo "Creating instance..."
