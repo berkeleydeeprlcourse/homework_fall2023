@@ -85,8 +85,8 @@ class PGAgent(nn.Module):
         # step 4: if needed, use all datapoints (s_t, a_t, q_t) to update the PG critic/baseline
         if self.critic is not None:
             # TODO: perform `self.baseline_gradient_steps` updates to the critic/baseline network
-            critic_info: dict = None
-
+            for _ in range(self.baseline_gradient_steps):
+                critic_info: dict = {"critic_info": self.critic.update(obs, q_values)["Baseline Loss"]}
             info.update(critic_info)
 
         return info
@@ -104,7 +104,7 @@ class PGAgent(nn.Module):
             # Case 2: in reward-to-go PG, we only use the rewards after timestep t to estimate the Q-value for (s_t, a_t).
             # In other words: Q(s_t, a_t) = sum_{t'=t}^T gamma^(t'-t) * r_{t'}
             # Use the helper function self._discounted_reward_to_go to calculate the Q-values
-            q_values = [np.array(self._discounted_reward_to_go(trajectory)) for trajectory in rewards]
+            q_values = [np.array(self._discounted_reward_to_go_dp(trajectory)) for trajectory in rewards]
 
         return q_values
 
@@ -124,12 +124,12 @@ class PGAgent(nn.Module):
             advantages = q_values
         else:
             # TODO: run the critic and use it as a baseline
-            values = None
+            values = ptu.to_numpy(self.critic(ptu.from_numpy(obs))).squeeze()
             assert values.shape == q_values.shape
 
             if self.gae_lambda is None:
                 # TODO: if using a baseline, but not GAE, what are the advantages?
-                advantages = None
+                advantages = q_values - values
             else:
                 # TODO: implement GAE
                 batch_size = obs.shape[0]
@@ -142,7 +142,8 @@ class PGAgent(nn.Module):
                     # TODO: recursively compute advantage estimates starting from timestep T.
                     # HINT: use terminals to handle edge cases. terminals[i] is 1 if the state is the last in its
                     # trajectory, and 0 otherwise.
-                    pass
+                    delta_t = rewards[i] + self.gamma * values[i+1] * (1 - terminals[i]) - values[i]
+                    advantages[i] = delta_t + self.gamma * self.gae_lambda * advantages[i+1] * (1 - terminals[i])
 
                 # remove dummy advantage
                 advantages = advantages[:-1]
@@ -167,12 +168,28 @@ class PGAgent(nn.Module):
 
         return [discounted_sum] * len(rewards)
 
-    def _discounted_reward_to_go(self, rewards: Sequence[float]) -> Sequence[float]:
+    def _discounted_reward_to_go_dp(self, rewards: Sequence[float]) -> Sequence[float]:
         """
         Helper function which takes a list of rewards {r_0, r_1, ..., r_t', ... r_T} and returns a list where the entry
         in each index t' is sum_{t'=t}^T gamma^(t'-t) * r_{t'}.
         """
-        return [
-            sum(self.gamma**(t_prime - t) * reward for t_prime, reward in enumerate(rewards[t:]))
-            for t in range(len(rewards))
-        ]
+        len_rewards = len(rewards)
+        discounted_rewards_to_go = np.zeros(len_rewards + 1)
+        for i in reversed(range(len_rewards)):
+            discounted_rewards_to_go[i] += rewards[i] + self.gamma * discounted_rewards_to_go[i+1]
+        discounted_rewards_to_go = discounted_rewards_to_go[:-1]
+        return discounted_rewards_to_go
+
+    def _discounted_reward_to_go_numpy(self, rewards: Sequence[float]) -> Sequence[float]:
+        """
+        Numpy sum works but normal sum does not due to floating point issues 
+        with taking a small number to a high power
+        """
+        len_rewards = len(rewards)
+        discounted_rewards_to_go = np.zeros(len_rewards)
+
+        for t in range(len_rewards):
+            discounted_sum = np.sum(self.gamma ** np.arange(len_rewards - t) * rewards[t:])
+            discounted_rewards_to_go[t] = discounted_sum
+
+        return discounted_rewards_to_go
