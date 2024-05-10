@@ -83,8 +83,6 @@ def run_training_loop(params):
     #############
     ## AGENT
     #############
-
-    # TODO: Implement missing functions in this class.
     actor = MLPPolicySL(
         ac_dim,
         ob_dim,
@@ -129,19 +127,18 @@ def run_training_loop(params):
         else:
             # DAGGER training from sampled data relabeled by expert
             assert params['do_dagger']
-            # TODO: collect `params['batch_size']` transitions
-            # HINT: use utils.sample_trajectories
-            # TODO: implement missing parts of utils.sample_trajectory
-            paths, envsteps_this_batch = TODO
+            paths, envsteps_this_batch = utils.sample_trajectories(env, actor, params['batch_size'], params['ep_len'])
 
             # relabel the collected obs with actions from a provided expert policy
             if params['do_dagger']:
                 print("\nRelabelling collected observations with labels from an expert policy...")
 
                 # TODO: relabel collected obsevations (from our policy) with labels from expert policy
+
                 # HINT: query the policy (using the get_action function) with paths[i]["observation"]
                 # and replace paths[i]["action"] with these expert labels
-                paths = TODO
+                for i in range(len(paths)):
+                  paths[i]["action"] = expert_policy.get_action(paths[i]["observation"])
 
         total_envsteps += envsteps_this_batch
         # add collected data to replay buffer
@@ -157,7 +154,10 @@ def run_training_loop(params):
           # HINT2: use np.random.permutation to sample random indices
           # HINT3: return corresponding data points from each array (i.e., not different indices from each array)
           # for imitation learning, we only need observations and actions.  
-          ob_batch, ac_batch = TODO
+          shuffled_replay_buffer = np.random.permutation(len(replay_buffer))[0:params['train_batch_size']]
+
+
+          ob_batch, ac_batch = replay_buffer.obs[shuffled_replay_buffer], replay_buffer.acs[shuffled_replay_buffer]
 
           # use the sampled data to train an agent
           train_log = actor.update(ob_batch, ac_batch)
