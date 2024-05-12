@@ -84,6 +84,19 @@ Then we can update the network using the REINFORCE algorithm
 	Evaluate $\nabla_\theta J(\theta) \approx \frac{1}{N} \overset{N}{\underset{i=1}{\sum}} [(\overset{T}{\underset{t=1}{\sum}} \nabla_\theta log \pi_\theta(a_{i,t} \vert s_{i,t})) (\overset{T}{\underset{t=1}{\sum}} r(s_{i,t},a_{i,t}))]$
 3) Assign $\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)$
 
+# Lecture 5.2 
+
+The derivation from 5.1 can be extended to the partial observable case to yield the following result
+
+$$
+\nabla_\theta J(\theta) \approx \frac{1}{N} \overset{N}{\underset{i=1}{\sum}} [(\overset{T}{\underset{t=1}{\sum}} \nabla_\theta log \pi_\theta(a_{i,t} \vert o_{i,t})) (\overset{T}{\underset{t=1}{\sum}} r(s_{i,t},a_{i,t}))]
+$$
+
+In practice policy gradient estimation suffers from high variance of collected rollouts. 
+
+# Lecture 5.3
+
+
 
 # 3.1 Behavioural Cloning
 
