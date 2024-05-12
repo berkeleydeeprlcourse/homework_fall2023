@@ -120,9 +120,101 @@ E[\nabla_\theta log p_\theta(\tau)b] = \int p_\theta(\tau) \nabla_\theta log p_\
 $$
 
 So indeed
+
 $$
 	\nabla_\theta J(\theta) \approx \frac{1}{N}  \overset{N}{\underset{i=1}{\sum}} \nabla_\theta log p_\theta(\tau) [r(\tau) - b] 
 $$
+
+### Optimal baseline
+
+Let's say that the optimal baseline is the baseline value that minimizes the variance of the estimator of $\nabla_\theta J(\theta)$. 
+
+A useful identity for variance is listed below.
+
+$$
+	Var(X) = \underset{x \in X}{\sum} (x - \mu_X)^2 p(x) = E((x - \mu_X)^2)
+$$
+$$
+	Var(X) = E(X^2 - 2\mu_X X + \mu_X^2) = E(X^2) - E(2\mu_X X) + E(\mu_X^2)
+$$
+$$
+	Var(X) = E(X^2) - 2\mu_X E(X) + \mu_X^2 = E(X^2) - 2E(X)^2 + E(X)^2
+$$
+$$
+	Var(X) = E(X^2) - E(X)^2
+$$
+
+Expand the variance of $\nabla_\theta J(\theta)$ using the above identity 
+
+$$
+	Var(\nabla_\theta J(\theta)) = E_{\tau \sim p_\theta(\tau)}((\nabla_\theta log p_\theta(\tau) (r(\tau) - b))^2) - E_{\tau \sim p_\theta(\tau)}(\nabla_\theta log p_\theta(\tau) (r(\tau) - b))^2
+$$
+
+We already know that baselines are unbiased estimators so
+
+$$
+	Var(\nabla_\theta J(\theta)) = E_{\tau \sim p_\theta(\tau)}((\nabla_\theta log p_\theta(\tau) (r(\tau) - b))^2) - E_{\tau \sim p_\theta(\tau)}(\nabla_\theta log p_\theta(\tau) r(\tau))^2
+$$
+
+The last term is not dependent on baseline so
+
+$$
+	\frac{dVar}{db} = \frac{dVar}{db}E_{\tau \sim p_\theta(\tau)}((\nabla_\theta log p_\theta(\tau) (r(\tau) - b))^2)
+$$
+
+For simplicy let $g(\tau) = \nabla_\theta log p_\theta (\tau)$
+
+$$
+	\frac{dVar}{db} = \frac{dVar}{db}E_{\tau \sim p_\theta(\tau)}((g(\tau)(r(\tau) - b))^2)
+$$
+$$
+	\frac{dVar}{db} = \frac{dVar}{db} E_{\tau \sim p_\theta(\tau)}(
+		g(\tau)^2 (r(\tau)^2 + b^2 - 2br(\tau))
+		)
+$$
+$$
+	\frac{dVar}{db} = \frac{dVar}{db} [
+	E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 r(\tau)^2) + 
+	E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 b^2) - 
+	E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 2br(\tau))
+	]
+$$
+
+$$
+	\frac{dVar}{db} = \frac{dVar}{db} [
+	b^2 E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 ) - 
+	2b E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 r(\tau))
+	]
+$$
+
+Minimizing the variance 
+
+$$
+0 = \frac{dVar}{db} [
+	b^2 E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 ) - 
+	2b E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 r(\tau))
+	]
+$$
+
+$$
+0 = 
+	2b E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 ) - 
+	2 E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 r(\tau))
+$$
+
+$$
+b = \frac{E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 r(\tau))}{E_{\tau \sim p_\theta(\tau)}(g(\tau)^2 )}
+$$
+
+$$
+b = \frac{
+E_{\tau \sim p_\theta(\tau)}((\nabla_\theta log p_\theta (\tau))^2 r(\tau))
+}{
+E_{\tau \sim p_\theta(\tau)}((\nabla_\theta log p_\theta (\tau))^2 )
+}
+$$
+
+So the optimal baseline actually depends on the current gradient. 
 
 # 3.1 Behavioural Cloning
 
