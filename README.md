@@ -84,7 +84,7 @@ Then we can update the network using the REINFORCE algorithm
 	Evaluate $\nabla_\theta J(\theta) \approx \frac{1}{N} \overset{N}{\underset{i=1}{\sum}} [(\overset{T}{\underset{t=1}{\sum}} \nabla_\theta log \pi_\theta(a_{i,t} \vert s_{i,t})) (\overset{T}{\underset{t=1}{\sum}} r(s_{i,t},a_{i,t}))]$
 3) Assign $\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)$
 
-# Lecture 5.2 
+# Lecture 5.2 Partially Observable
 
 The derivation from 5.1 can be extended to the partial observable case to yield the following result
 
@@ -94,9 +94,35 @@ $$
 
 In practice policy gradient estimation suffers from high variance of collected rollouts. 
 
-# Lecture 5.3
+# Lecture 5.3 Reward-to-Go and Baselines
 
+### Reward-to-go result
 
+From lecture 5.2 we derived the expression
+
+$$
+\nabla_\theta J(\theta) \approx \frac{1}{N} \overset{N}{\underset{i=1}{\sum}} [(\overset{T}{\underset{t=1}{\sum}} \nabla_\theta log \pi_\theta(a_{i,t} \vert s_{i,t})) (\overset{T}{\underset{t=1}{\sum}} r(s_{i,t},a_{i,t}))]$$
+
+Notice how we are muiltiplying by $\overset{T}{\underset{t=1}{\sum}} r(s_{i,t},a_{i,t})$ at every  marginal. By the causality property of time we know that actions taken at time $t$ do not not affect rewards at time $t'<0$. So intuitively we can reduce the variance of the estimate as follows: 
+
+$$
+\nabla_\theta J(\theta) \approx \frac{1}{N} \overset{N}{\underset{i=1}{\sum}} [(\overset{T}{\underset{t=1}{\sum}} \nabla_\theta log \pi_\theta(a_{i,t} \vert s_{i,t}) \overset{t}{\underset{t'=1}{\sum}} r(s_{i,t'},a_{i,t'}))]
+$$
+
+A proof of the result can be viewed at https://spinningup.openai.com/en/latest/spinningup/extra_pg_proof1.html. 
+
+### Baselines
+
+Suppose we want to add a constant offset to the reward function of our policy gradient. Is this still an unbiased estimator of the original policy gradient? 
+
+$$
+E[\nabla_\theta log p_\theta(\tau)b] = \int p_\theta(\tau) \nabla_\theta log p_\theta(\tau) b d \tau = \int \nabla_\theta p_\theta(\tau) b d \tau = \nabla_\theta \int p_\theta (\tau) b d \tau = \nabla_\theta [1*b] = 0
+$$
+
+So indeed
+$$
+	\nabla_\theta J(\theta) \approx \frac{1}{N}  \overset{N}{\underset{i=1}{\sum}} \nabla_\theta log p_\theta(\tau) [r(\tau) - b] 
+$$
 
 # 3.1 Behavioural Cloning
 
