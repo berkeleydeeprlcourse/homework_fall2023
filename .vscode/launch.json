@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "lunar lander",
             "type": "debugpy",
@@ -9,6 +10,15 @@
             "cwd": "${workspaceFolder}/hw3",
             "console": "integratedTerminal",
             "args": "-cfg experiments/dqn/lunarlander.yaml --seed 1"
+        },
+{
+            "name": "cartpole (v1)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/hw3/cs285/scripts/run_hw3_dqn.py",
+            "cwd": "${workspaceFolder}/hw3",
+            "console": "integratedTerminal",
+            "args": "-cfg experiments/dqn/cartpole.yaml --seed 1"
         }
     ]
 }
