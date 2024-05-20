@@ -120,7 +120,7 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             batch = ptu.from_numpy(batch)
 
             update_info = agent.update_critic(
-                obs=batch["observation"],
+                obs=batch["observations"],
                 action=batch["actions"],
                 reward=batch["rewards"],
                 next_obs=batch["next_observations"],

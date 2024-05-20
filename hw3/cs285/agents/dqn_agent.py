@@ -49,9 +49,9 @@ class DQNAgent(nn.Module):
         observation = ptu.from_numpy(np.asarray(observation))[None]
 
         if random.random() < epsilon:
-            action = random.randint(0, self.num_actions)
+            action = random.randint(0, self.num_actions-1)
         else:
-            action = self.critic(observation).argmax()
+            action = self.critic(observation).argmax().item()
 
         return action 
 
