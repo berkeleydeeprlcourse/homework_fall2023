@@ -4,6 +4,7 @@ import torch
 from torch import nn
 
 import numpy as np
+import random
 
 import cs285.infrastructure.pytorch_util as ptu
 
@@ -47,10 +48,12 @@ class DQNAgent(nn.Module):
         """
         observation = ptu.from_numpy(np.asarray(observation))[None]
 
-        # TODO(student): get the action from the critic using an epsilon-greedy strategy
-        action = ...
+        if random.random() < epsilon:
+            action = random.randint(0, self.num_actions)
+        else:
+            action = self.critic(observation).argmax()
 
-        return ptu.to_numpy(action).squeeze(0).item()
+        return action 
 
     def update_critic(
         self,
