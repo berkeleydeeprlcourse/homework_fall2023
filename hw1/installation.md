@@ -23,7 +23,12 @@ A. (Recommended) Install with conda:
 
 	4. Install the requirements into this conda environment
 	```
+	sudo apt install swig
+	sudoapt install libgl1-mesa-glx
 	pip install -r requirements.txt
+	pip uninstall opencv-python
+	pip install opencv-python
+	pip install numpy==1.19.5
 	```
 
 	5. Allow your code to be able to see 'cs285'
