@@ -10,17 +10,18 @@ You need to open a new terminal for that path change to take place (to be able t
 
 2. Create a conda environment that will contain Python 3:
 ```
-conda create -n cs285 python=3.10
+conda create -n cs285 python=3.9
 ```
 
 3. Activate the environment (do this every time you open a new terminal and want to run code):
 ```
-conda activate cs285
+source activate cs285
 ```
 
 4. Install the requirements into this conda environment
 ```
 pip install -r requirements.txt
+pip install numpy==1.19.5
 ```
 
 5. Allow your code to be able to see the homework.

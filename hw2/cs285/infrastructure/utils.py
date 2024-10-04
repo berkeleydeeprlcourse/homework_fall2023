@@ -30,14 +30,15 @@ def sample_trajectory(
             )
 
         # TODO use the most recent ob and the policy to decide what to do
-        ac: np.ndarray = None
+        action_distribution = policy.forward(ptu.from_numpy(ob))
+        ac: np.ndarray = action_distribution.sample()
 
         # TODO: use that action to take a step in the environment
-        next_ob, rew, done, _ = None, None, None, None
+        next_ob, rew, done, _ = env.step(ptu.to_numpy(ac))
 
         # TODO rollout can end due to done, or due to max_length
         steps += 1
-        rollout_done: bool = None
+        rollout_done: bool = done or steps >= max_length
 
         # record result of taking that action
         obs.append(ob)
