@@ -29,6 +29,8 @@ class ValueCritic(nn.Module):
             size=layer_size,
         ).to(ptu.device)
 
+        self.loss = nn.MSELoss()
+
         self.optimizer = optim.Adam(
             self.network.parameters(),
             learning_rate,
@@ -36,7 +38,7 @@ class ValueCritic(nn.Module):
 
     def forward(self, obs: torch.Tensor) -> torch.Tensor:
         # TODO: implement the forward pass of the critic network
-        pass
+        return self.network(obs)
         
 
     def update(self, obs: np.ndarray, q_values: np.ndarray) -> dict:
@@ -44,7 +46,13 @@ class ValueCritic(nn.Module):
         q_values = ptu.from_numpy(q_values)
 
         # TODO: update the critic using the observations and q_values
-        loss = None
+        self.optimizer.zero_grad()
+
+        q_values_predicted = self(obs).squeeze()
+        loss = self.loss(q_values, q_values_predicted)
+
+        loss.backward()
+        self.optimizer.step()
 
         return {
             "Baseline Loss": ptu.to_numpy(loss),

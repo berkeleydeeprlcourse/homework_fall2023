@@ -27,7 +27,6 @@ class Logger:
         self._summ_writer.add_video('{}'.format(name), video_frames, step, fps=fps)
 
     def log_trajs_as_videos(self, trajs, step, max_videos_to_save=2, fps=10, video_title='video'):
-
         # reshape the rollouts
         videos = [np.transpose(p['image_obs'], [0, 3, 1, 2]) for p in trajs]
 
