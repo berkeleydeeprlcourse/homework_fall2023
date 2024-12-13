@@ -119,7 +119,7 @@ class PGAgent(nn.Module):
         """
         if self.critic is None:
             # TODO: if no baseline, then what are the advantages?
-            advantages = q_values
+            advantages = q_values.copy()
         else:
             # TODO: run the critic and use it as a baseline
             obs_t = ptu.from_numpy(obs)
@@ -145,17 +145,19 @@ class PGAgent(nn.Module):
                     # TODO: recursively compute advantage estimates starting from timestep T.
                     # HINT: use terminals to handle edge cases. terminals[i] is 1 if the state is the last in its
                     # trajectory, and 0 otherwise.
-                    if terminals[i] != 1:
-                        advantages[i] = (
-                            rewards[i] + 
-                            self.gamma * values[i+1] - 
-                            values[i] + 
-                            self.gae_lambda * self.gamma * advantages[i+1]
-                        )
-                    else:
-                        advantages[i] = (
-                            rewards[i] - values[i]
-                        )
+                    # if terminals[i] != 1:
+                    #     advantages[i] = (
+                    #         rewards[i] + 
+                    #         self.gamma * values[i+1] - 
+                    #         values[i] + 
+                    #         self.gae_lambda * self.gamma * advantages[i+1]
+                    #     )
+                    # else:
+                    #     advantages[i] = (
+                    #         rewards[i] - values[i]
+                    #     )
+                    sigma = rewards[i] + (1 - terminals[i]) * self.gamma * values[i+1] - values[i]
+                    advantages[i] = sigma + self.gamma * self.gae_lambda * advantages[i+1]
                 # remove dummy advantage
                 advantages = advantages[:-1]
 
@@ -163,10 +165,7 @@ class PGAgent(nn.Module):
         if self.normalize_advantages:
             mean = np.mean(advantages)
             std = np.std(advantages)
-            if std == 0:
-                advantages = np.zeros_like(advantages)  # Assign zeros (or other default value)
-            else:
-                advantages = (advantages - mean) / std
+            advantages = (advantages - mean) / (std + 1e-8)
 
         return advantages
 
@@ -180,8 +179,7 @@ class PGAgent(nn.Module):
         """
         total_reward = 0
         for i, reward in enumerate(rewards):
-            total_reward += self.gamma ** (i) * reward
-
+            total_reward += self.gamma ** i * reward
         return np.repeat(total_reward, len(rewards))
 
 
@@ -190,29 +188,34 @@ class PGAgent(nn.Module):
         Helper function which takes a list of rewards {r_0, r_1, ..., r_t', ... r_T} and returns a list where the entry
         in each index t' is sum_{t'=t}^T gamma^(t'-t) * r_{t'}.
         """
-        total_rewards = []
-        episodes = len(rewards)
+        # total_rewards = np.zeros(len(rewards))
+        # cumulative_reward = 0
 
-        for i, reward in enumerate(reversed(rewards)):
-            cur_reward = reward * self.gamma**(episodes - i -1)
-            cur_reward += 0 if i == 0 else total_rewards[-1]
-            total_rewards.append(cur_reward)
-                                 
-        return np.array(total_rewards[::-1])
+        # for i, reward in enumerate(reversed(rewards)):
+        #     cumulative_reward = reward + self.gamma * cumulative_reward
+        #     total_rewards[i] = cumulative_reward
+        
+        # return total_rewards[::-1]
+
+        discounted_rewards = []
+        for i in range(len(rewards)):
+            discounted_reward = 0
+            for j in range(i, len(rewards)):
+                discounted_reward += (self.gamma ** (j - i)) * rewards[j]
+            discounted_rewards.append(discounted_reward)
+
+        return discounted_rewards
 
 
 def _test_discounted_reward_to_go(rewards, gamma=0.5):
 
-    total_rewards = []
-    episodes = len(rewards)
-
+    total_rewards = np.zeros(len(rewards))
+    cumulative_reward = 0
     for i, reward in enumerate(reversed(rewards)):
-        cur_reward = reward * gamma**(episodes - i - 1)
-        cur_reward += (0 if i == 0 else total_rewards[-1])
-        total_rewards.append(cur_reward)
-                                
-    return total_rewards[::-1]
+        cumulative_reward = reward + gamma * cumulative_reward
+        total_rewards[i] = cumulative_reward
 
+    return total_rewards[::-1]
 
 def _discounted_return(rewards, gamma=0.5):
     """

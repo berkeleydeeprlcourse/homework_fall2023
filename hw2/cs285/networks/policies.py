@@ -102,11 +102,13 @@ class MLPPolicyPG(MLPPolicy):
         advantages = ptu.from_numpy(advantages)
 
         # TODO: implement the policy gradient actor update.
-        self.optimizer.zero_grad()
         action_distribution = self(obs)
         log_probs = action_distribution.log_prob(actions) # sample size; log probability under current policy
-        loss = -(log_probs * advantages).mean() 
+        #loss = -(log_probs * advantages).mean() 
 
+        loss = torch.neg(torch.mean(torch.mul(log_probs, advantages)))
+
+        self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 

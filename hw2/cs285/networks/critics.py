@@ -29,8 +29,6 @@ class ValueCritic(nn.Module):
             size=layer_size,
         ).to(ptu.device)
 
-        self.loss = nn.MSELoss()
-
         self.optimizer = optim.Adam(
             self.network.parameters(),
             learning_rate,
@@ -49,7 +47,7 @@ class ValueCritic(nn.Module):
         self.optimizer.zero_grad()
 
         q_values_predicted = self(obs).squeeze()
-        loss = self.loss(q_values, q_values_predicted)
+        loss = F.mse_loss(q_values, q_values_predicted)
 
         loss.backward()
         self.optimizer.step()
